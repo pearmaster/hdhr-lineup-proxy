@@ -5,7 +5,7 @@ LINEUP_FILE="/data/lineup.json"
 function make_file() {
     TUNER=$1
     DEVICE_ID=$2
-    hdhomerun_config scan ${HDHR_IP_ADDR} ${TUNER} /tmp/scanresults.txt
+    hdhomerun_config ${HDHR_IP_ADDR} scan ${TUNER} /tmp/scanresults.txt
     /usr/bin/python3 /usr/local/share/convert_lineup.py ${DEVICE_ID} /tmp/scanresults.txt ${LINEUP_FILE}
     return $?
 }
