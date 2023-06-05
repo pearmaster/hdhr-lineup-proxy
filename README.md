@@ -1,29 +1,41 @@
 # hdhr-lineup-proxy
-Docker recipe for a proxy to ipv4-api.hdhomerun.com with override of lineup
 
-I'm not sure exactly how it all works, but the old **HDHR3-US DUAL** device stores its channel lineup on the hdhomerun servers at:
+Docker recipe for a proxy to api.hdhomerun.com with the ability to override the lineup.
+
+The old **HDHR3-US DUAL** device stores its channel lineup on the hdhomerun servers at:
 ```
-http://ipv4-api.hdhomerun.com/api/lineup?DeviceAuth=${DEVICE_AUTH}
+http://api.hdhomerun.com/api/lineup?DeviceAuth={DEVICE_AUTH}
 ```
 
-I think the way this gets created is by using a Windows App.  But editing this is hard for people like me who always use Linux.    So I created this docker image which proxies content from ipv4-api.hdhomerun.com except it caches and allows for modifications to a lineup.json file.
+(Note: it used to be ipv4-api.hdhomerun.com)
+
+The lineup is created and uploaded when using the Windows application.  If you're no longer using the Windows application, you can't refresh the file on the hdhomerun.com servers, which can leave your channel list old and outdated.
+
+This is consequential if you're using Emby (or possibly other DVR software like Plex or JellyFin) which will only load the outdated lineup fine.
+
+Instead, if you run this on the same server as your DVR software (and configure it as shown below) then you can load an updateable lineup instead.
 
 ## Installation
 
+There are at least two steps:
+1. Run the docker image.
+2. Modify `/etc/hosts` to load lineup from docker
+
+
 ### Starting docker container
 
-You should create a directory that can be shared between the host and the container.  In this directory should be created a `lineup.json` file that can be edited.  In the example below, I'm using `/tmp/hdhr`.
-
-Start the container like this:
+Most basically, you can start the container like this:
 ```sh
-docker run -d -e HDHR_IP_ADDR=<IP_ADDR_TO_HDHR_DEVICE> -v /tmp/hdhr:/data --name hdhr-lineup-proxy pearmaster/hdhr-lineup-proxy
+docker run -d -e HDHR_IP_ADDR=${IP_ADDR_TO_HDHR_DEVICE} --name hdhr-lineup-proxy pearmaster/hdhr-lineup-proxy
 ```
 
-### Modifying `lineup.json`
+On startup, it will connect to your HDHomerun Device and scan for channels, saving the channel list and providing it over HTTP. 
 
-If a copy of `lineup.json` doesn't exist on container startup, it will attempt to download it to `/data/lineup.json` in the container (which you should have mapped to a directory on the host; see above).  Any modifications you make to this file will be served instead of the version fro the hdhomerun.com servers.
+### Configure DNS
 
-### Container's IP address
+The next step is to convince your computer (the one running DVR software) that it needs to load the lineup from docker instead of the hdhomerun.com servers.  
+
+#### Find IP address of Docker container
 
 You need to determine the IP address of the container.  This command will show it to you:
 ```sh
@@ -31,13 +43,14 @@ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' hdh
 ```
 The result should be something like: `172.17.0.3`
 
-### DNS
+#### Modify `/etc/hosts`
 
 You need to modify the `/etc/hosts` file on the system that is trying to obtain the lineup information from the server.
 
 Add this line, where the provided IP address it the IP address of your docker container:
 ```
-172.17.0.3   ipv4-api.hdhomerun.com
+172.17.0.3   api.hdhomerun.com
+172.17.0.3   ipv4-api.hdhomerun.com # May be needed if your HDHR3 firmware is old.
 ```
 
 ## How it works
@@ -45,3 +58,7 @@ Add this line, where the provided IP address it the IP address of your docker co
 Your HDHR client, like [Emby](https://emby.media), will get `172.17.0.3` as the IP address for ipv4-api.hdhomerun.com instead of the actual public IP address.  Emby will then ask the docker image for the lineup.json file, and will receive any modifications you've made to the file.
 
 It is a little bit like a man-in-the-middle hack.
+
+## License
+
+Apache License.
