@@ -10,6 +10,7 @@ RUN apk add --no-cache python3
 COPY ./download-data.sh /docker-entrypoint.d/30-download-data.sh
 COPY ./proxy.conf /etc/nginx/conf.d/proxy.conf
 COPY ./convert_lineup.py /usr/local/share/convert_lineup.py
+COPY ./periodic.sh /etc/periodic/weekly/refresh_lineup.sh
 
 VOLUME /data
 
