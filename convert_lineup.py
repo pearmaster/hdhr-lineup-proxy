@@ -20,11 +20,13 @@ if __name__ == '__main__':
         channel_results = re.findall(channel_pattern, result[2])
         for ch in channel_results:
             entry = {
-                "GuideNumber": ch[1],
-                "GuideName": ch[2],
+                "GuideNumber": str(ch[1]),
+                "GuideName": str(ch[2]),
                 "URL": f"hdhomerun://{tuner_name}/ch{result[0]}-{ch[0]}"
             }
             lineup.append(entry)
+    
+    print(lineup)
     
     with open(output_filename, 'w') as fp:
         json.dump(fp, lineup, indent=4)
