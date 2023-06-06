@@ -9,6 +9,8 @@ sed -i 's/https:/http:/g' ${DISCOVER_FILE}.new
 
 sed -i "s/api.hdhomerun.com/${MY_IP}/g" ${DISCOVER_FILE}.new
 
+sed -i "s/HDHR_IP_ADDR/${HDHR_IP_ADDR}/g" /etc/nginx/conf.d/proxy.conf
+
 mv ${DISCOVER_FILE}.new ${DISCOVER_FILE}
 
 cat ${DISCOVER_FILE}
