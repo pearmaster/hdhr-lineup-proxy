@@ -11,8 +11,11 @@ function make_file() {
 }
 
 if [ -n "${HDHR_IP_ADDR}" ]; then
-    DEVICE_ID=$(wget -q http://${HDHR_IP_ADDR}/discover.json -O - | jq -r '.DeviceId')
-    echo "Device ID is ${DEVICE_ID}"
+    wget -q http://${HDHR_IP_ADDR}/discover.json -O /tmp/discover.json
+    DEVICE_ID=$(cat /tmp/discover.json | jq -r '.DeviceId')
+    if [ "${DEVICE_ID}" == "null" ]; then
+        DEVICE_ID=$(cat /tmp/discover.json | jq -r '.DeviceID')
+    fi
     if [ -n "$DEVICE_ID" ]; then
         hdhomerun_config ${HDHR_IP_ADDR} get /tuner0/status | grep 'ch=none' > /dev/null
         if [ $? -eq 0 ]; then
