@@ -20,4 +20,4 @@ RUN chmod a+x /docker-entrypoint.d/31-download-discovery.sh
 COPY ./proxy.conf /etc/nginx/conf.d/proxy.conf
 COPY ./convert_lineup.py /usr/local/share/convert_lineup.py
 COPY ./periodic.sh /etc/periodic/weekly/refresh_lineup.sh
-RUN ln -s /docker-entrypoint.d/31-download-discovery.sh /etc/periodic/15m/refresh_discover.sh
+RUN ln -s /docker-entrypoint.d/31-download-discovery.sh /etc/periodic/15min/refresh_discover.sh
