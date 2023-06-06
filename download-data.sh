@@ -2,6 +2,11 @@
 
 LINEUP_FILE="/data/lineup.json"
 
+grep hdhr /etc/hosts > /dev/null
+if [ $? -ne 0 ]; then
+    echo "${HDHR_IP_ADDR} hdhr" >> /etc/hosts
+fi
+
 function make_file() {
     TUNER=$1
     DEVICE_ID=$2
