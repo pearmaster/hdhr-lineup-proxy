@@ -11,4 +11,6 @@ sed -i "s/api.hdhomerun.com/${MY_IP}/g" ${DISCOVER_FILE}.new
 
 mv ${DISCOVER_FILE}.new ${DISCOVER_FILE}
 
+cat ${DISCOVER_FILE}
+
 exit 0
