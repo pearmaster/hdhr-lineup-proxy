@@ -53,6 +53,14 @@ Add this line, where the provided IP address it the IP address of your docker co
 172.17.0.3   ipv4-api.hdhomerun.com # May be needed if your HDHR3 firmware is old.
 ```
 
+#### IpTables
+
+On 2023+ firmware, they've put the lineup on https which thwarts the mechanisms so far.  But by inserting an IpTables rule, we can redirect attempts to get the discover.json file from the docker image instead of the device:
+```sh
+export PROXY_IP_ADDR=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' hdhr-lineup-proxy)
+sudo iptables -t nat -I OUTPUT -p tcp ! --source ${PROXY_IP_ADDR} --dest ${IP_ADDR_TO_HDHR_DEVICE} --dport 80 -j DNAT --to-destination ${PROXY_IP_ADDR}:80
+```
+
 ## How it works
 
 Your HDHR client, like [Emby](https://emby.media), will get `172.17.0.3` as the IP address for ipv4-api.hdhomerun.com instead of the actual public IP address.  Emby will then ask the docker image for the lineup.json file, and will receive any modifications you've made to the file.
