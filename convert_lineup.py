@@ -26,9 +26,7 @@ if __name__ == '__main__':
             }
             lineup.append(entry)
     
-    print(lineup)
-    
     with open(output_filename, 'w') as fp:
-        json.dump(fp, lineup, indent=4)
+        json.dump(obj=lineup, fp=fp, indent=4)
 
     sys.exit(0)
